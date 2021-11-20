@@ -12,7 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
-namespace Web.API
+namespace EventManager.Api
 {
     public class Startup
     {
@@ -30,7 +30,7 @@ namespace Web.API
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web.API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "EventManager.Api", Version = "v1" });
             });
         }
 
@@ -41,8 +41,10 @@ namespace Web.API
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Web.API v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "EventManager.Api v1"));
             }
+
+            app.UseHttpsRedirection();
 
             app.UseRouting();
 

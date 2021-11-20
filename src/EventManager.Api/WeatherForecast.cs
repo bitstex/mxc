@@ -1,6 +1,6 @@
 using System;
 
-namespace Web.API
+namespace EventManager.Api
 {
     public class WeatherForecast
     {
