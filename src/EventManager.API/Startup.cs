@@ -53,7 +53,6 @@ namespace EventManager.API
                                 }
                             },
                             new string[] {}
-
                     }
           });
       });
@@ -67,6 +66,10 @@ namespace EventManager.API
         app.UseDeveloperExceptionPage();
         app.UseSwagger();
         app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "EventManager.API v1"));
+      }
+      else
+      {
+        app.UseExceptionHandler("/Error");
       }
 
       app.UseHttpsRedirection();

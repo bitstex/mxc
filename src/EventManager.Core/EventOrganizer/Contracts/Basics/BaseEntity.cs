@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
-using EventManager.API.Common.Events;
 
-namespace EventManager.API.Common.Entities
+namespace EventManager.Core.EventOrganizer.Basics
 {
   /// <summary>
-  /// Reusable base entity class for arbitrary derived entity 
+  /// Reusable base entity class for the arbitrary derived entity 
   /// </summary>
   /// <typeparam name="TId">Generic type of the ID of the derived entity</typeparam>
   public abstract class BaseEntity<TId> : IEquatable<BaseEntity<TId>>
@@ -20,7 +18,6 @@ namespace EventManager.API.Common.Entities
     /// </summary>
     /// <typeparam name="BaseDomainEvent">Base class of the derived domain events </typeparam>
     /// <returns>List of the occurred domain events</returns>
-    public List<BaseDomainEvent> Events = new List<BaseDomainEvent>();
 
     #region Equality
     /// <summary>

@@ -1,6 +1,6 @@
 using Ardalis.Specification;
 
-namespace EventManager.API.Common.Contracts
+namespace EventManager.Core.EventOrganizer.Contracts.Interfaces
 {
 
   /// <summary>

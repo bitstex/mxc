@@ -1,7 +1,7 @@
 
 using Ardalis.Specification;
 
-namespace EventManager.API.Common.Contracts
+namespace EventManager.Core.EventOrganizer.Contracts.Interfaces
 {
   /// <summary>
   /// This interface support to implement the read model of domain models

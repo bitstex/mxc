@@ -1,4 +1,4 @@
-namespace EventManager.API.Common.Contracts
+namespace EventManager.Core.EventOrganizer.Contracts.Interfaces
 {
   /// <summary>
   /// Use the IAggregateRoot interface to the domain object which encapsulates operations on multiple child objects.

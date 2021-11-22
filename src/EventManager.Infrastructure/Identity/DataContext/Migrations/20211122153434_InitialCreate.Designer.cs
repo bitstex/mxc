@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace EventManager.API.Migrations
+namespace EventManager.Infrastructure.Identity.DataContext.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20211122090201_InitialCreate")]
+    [DbContext(typeof(IdentitfyDbContext))]
+    [Migration("20211122153434_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
