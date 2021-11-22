@@ -1,6 +1,3 @@
-using EventManager.Core.Identity.Contracts.Interfaces;
-using EventManager.Infrastructure.Identity.DataContext;
-using EventManager.Infrastructure.Identity.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -15,12 +12,12 @@ namespace EventManager.Infrastructure
   {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-      services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("ConnStr"), b => b.MigrationsAssembly("EventManager.API")));
+      // services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("ConnStr"), b => b.MigrationsAssembly("EventManager.API")));
 
-      // For Identity  
-      services.AddIdentity<ApplicationUser, IdentityRole>()
-          .AddEntityFrameworkStores<ApplicationDbContext>()
-          .AddDefaultTokenProviders();
+      // // For Identity  
+      // services.AddIdentity<ApplicationUser, IdentityRole>()
+      //     .AddEntityFrameworkStores<ApplicationDbContext>()
+      //     .AddDefaultTokenProviders();
 
       // Adding Authentication  
       services.AddAuthentication(options =>
@@ -46,7 +43,7 @@ namespace EventManager.Infrastructure
       });
 
       // Service for support to authentication operation in the domain context
-      services.AddTransient<IIdentityService, IdentityService>();
+      //services.AddTransient<IIdentityService, IdentityService>();
       return services;
     }
   }
