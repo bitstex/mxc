@@ -2,10 +2,11 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using EventManager.Core.EventOrganizer.Basics;
+using EventManager.Core.EventOrganizer.Contracts.Interfaces;
 
 namespace EventManager.Core.EventOrganizer.Entities
 {
-  public class EventEntity : BaseEntity<Guid>
+  public class EventEntity : BaseEntity<Guid>, IAggregateRoot
   {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -15,15 +16,12 @@ namespace EventManager.Core.EventOrganizer.Entities
     public string Name { get; set; }
 
     [MaxLength(100)]
-    [Required(ErrorMessage = "Location of the event is must")]
     public string Location { get; set; }
 
     public uint Capacity { get; set; }
 
     public string Country { get; set; }
 
-
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public DateTime CreatedDate { get; private set; }
+    public DateTime CreatedDate { get; set; }
   }
 }
