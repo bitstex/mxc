@@ -112,7 +112,10 @@ namespace EventManager.API.Controllers.EventOrganizer
       _logger.LogTrace(String.Format("HTTP Get request is received with: {0}", filter));
 
       filter = filter ?? new EventFilter();
-      return _eventRepository.ListAsync(new EventSpecification(filter));
+      var results = _eventRepository.ListAsync(new EventSpecification(filter));
+      _logger.LogDebug(String.Format("results: {0}", results));
+      _logger.LogInformation("All events are filtered");
+      return results;
     }
 
     /// <summary>
