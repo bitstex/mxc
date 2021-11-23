@@ -10,16 +10,16 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EventManager.Infrastructure.EventOrganizer.DataContext.Migrations
 {
     [DbContext(typeof(EventOrganizerDbContext))]
-    [Migration("20211122173448_InitialCreate")]
+    [Migration("20211123063428_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .UseIdentityByDefaultColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasAnnotation("ProductVersion", "5.0.0");
+                .HasAnnotation("ProductVersion", "5.0.5")
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             modelBuilder.Entity("EventManager.Core.EventOrganizer.Entities.EventEntity", b =>
                 {
@@ -27,15 +27,17 @@ namespace EventManager.Infrastructure.EventOrganizer.DataContext.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<long>("Capacity")
+                    b.Property<long?>("Capacity")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Country")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Location")
                         .IsRequired()

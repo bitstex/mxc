@@ -14,9 +14,10 @@ namespace EventManager.Infrastructure.EventOrganizer.DataContext.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Location = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Capacity = table.Column<long>(type: "bigint", nullable: false),
+                    Capacity = table.Column<long>(type: "bigint", nullable: true),
                     Country = table.Column<string>(type: "text", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
