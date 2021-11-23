@@ -1,11 +1,12 @@
 using EventManager.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using NLog.Extensions.Logging;
 
 namespace EventManager.API
 {
@@ -26,6 +27,7 @@ namespace EventManager.API
       //   config.DefaultApiVersion = new ApiVersion(1, 0);
       //   config.AssumeDefaultVersionWhenUnspecified = true;
       // });
+      services.AddLogging();
       services.AddInfrastructure(Configuration);
       services.AddControllers();
       services.AddSwaggerGen(swagger =>
@@ -77,6 +79,8 @@ namespace EventManager.API
       {
         app.UseExceptionHandler("/Error");
       }
+
+      // app.UseMiddleware<ErrorLoggingMiddleware>();
 
       app.UseHttpsRedirection();
 

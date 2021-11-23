@@ -6,6 +6,9 @@ using EventManager.Core.EventOrganizer.Contracts.Interfaces;
 
 namespace EventManager.Core.EventOrganizer.Entities
 {
+  /// <summary>
+  /// Root of the domain objects
+  /// </summary>
   public class EventEntity : BaseEntity<Guid>, IAggregateRoot
   {
     [Key]

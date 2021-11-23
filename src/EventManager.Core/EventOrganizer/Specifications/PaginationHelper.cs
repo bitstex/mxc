@@ -2,6 +2,9 @@ using EventManager.Core.EventOrganizer.Specifications.Filters;
 
 namespace EventManager.Core.EventOrganizer.Specifications
 {
+  /// <summary>
+  /// Helper class to support paging on the server side 
+  /// </summary>
   public static class PaginationHelper
   {
 

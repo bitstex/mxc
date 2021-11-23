@@ -5,6 +5,9 @@ using EventManager.Core.Identity.Models;
 
 namespace EventManager.Core.Identity.Contracts.Interfaces
 {
+  /// <summary>
+  /// Interface to handle authentication and authorization
+  /// </summary>
   public interface IIdentityService
   {
     /// <summary>
@@ -25,7 +28,7 @@ namespace EventManager.Core.Identity.Contracts.Interfaces
     /// Create the token based on the user claims
     /// </summary>
     /// <param name="claims"></param>
-    /// <returns>The signed token and expiration of the token</returns>
+    /// <returns>The signed token and expiration of the token to the authorization </returns>
     TokenModel GrantTokenForUserClaims(List<Claim> claims);
   }
 }
