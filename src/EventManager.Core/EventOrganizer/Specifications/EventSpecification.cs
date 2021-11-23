@@ -1,3 +1,4 @@
+using System;
 using Ardalis.Specification;
 using EventManager.Core.EventOrganizer.Entities;
 using EventManager.Core.EventOrganizer.Specifications.Filters;
@@ -15,6 +16,9 @@ namespace EventManager.Core.EventOrganizer.Specifications
       if (filter.IsPagingEnabled)
         Query.Skip(PaginationHelper.CalculateSkip(filter))
              .Take(PaginationHelper.CalculateTake(filter));
+
+      if (filter.Id != null && Guid.Empty != filter.Id)
+        Query.Where(x => x.Id == filter.Id);
 
       if (!string.IsNullOrEmpty(filter.Name))
         Query.Where(x => x.Name == filter.Name);

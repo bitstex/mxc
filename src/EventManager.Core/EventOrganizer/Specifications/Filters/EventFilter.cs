@@ -4,7 +4,7 @@ namespace EventManager.Core.EventOrganizer.Specifications.Filters
 {
   public class EventFilter : PagingFilter
   {
-    public Guid Id { get; set; }
+    public Guid? Id { get; set; }
 
     public string Name { get; set; }
 
