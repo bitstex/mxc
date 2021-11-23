@@ -29,7 +29,7 @@ namespace EventManager.Core.EventOrganizer.Specifications
       if (!string.IsNullOrEmpty(filter.Location))
         Query.Search(x => x.Location, "%" + filter.Location + "%");
 
-      if (filter.Capacity > 0)
+      if (filter.Capacity != null && filter.Capacity > 0)
         Query.Where(x => x.Capacity == filter.Capacity);
 
     }

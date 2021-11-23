@@ -13,7 +13,7 @@ namespace EventManager.API.Controllers.Authentication
   /// <summary>
   /// Authentication controller to login or register a user
   /// </summary>
-  [Route("api/[controller]")]
+  [Route("api/v1/auth")]
   [ApiController]
   public class AuthenticateController : ControllerBase
   {

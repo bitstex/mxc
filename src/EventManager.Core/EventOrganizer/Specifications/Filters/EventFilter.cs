@@ -10,7 +10,7 @@ namespace EventManager.Core.EventOrganizer.Specifications.Filters
 
     public string Location { get; set; }
 
-    public uint Capacity { get; set; }
+    public uint? Capacity { get; set; }
 
     public string Country { get; set; }
   }

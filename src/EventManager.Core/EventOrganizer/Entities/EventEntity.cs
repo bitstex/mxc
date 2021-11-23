@@ -16,9 +16,10 @@ namespace EventManager.Core.EventOrganizer.Entities
     public string Name { get; set; }
 
     [MaxLength(100)]
+    [Required(ErrorMessage = "Location of the event is must")]
     public string Location { get; set; }
 
-    public uint Capacity { get; set; }
+    public uint? Capacity { get; set; }
 
     public string Country { get; set; }
 
