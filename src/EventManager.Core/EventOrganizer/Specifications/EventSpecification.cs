@@ -5,6 +5,9 @@ using EventManager.Core.EventOrganizer.Specifications.Filters;
 
 namespace EventManager.Core.EventOrganizer.Specifications
 {
+  /// <summary>
+  /// Ordering and filtering
+  /// </summary>
   public class EventSpecification : Specification<EventEntity>
   {
     public EventSpecification(EventFilter filter)

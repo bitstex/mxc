@@ -2,6 +2,9 @@ using System;
 
 namespace EventManager.Core.EventOrganizer.Specifications.Filters
 {
+  /// <summary>
+  /// Model to support specification of the event
+  /// </summary>
   public class EventFilter : PagingFilter
   {
     public Guid? Id { get; set; }
