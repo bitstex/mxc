@@ -1,3 +1,4 @@
+using EventManager.Core.EventOrganizer.Contracts.Interfaces;
 using EventManager.Core.Identity.Contracts.Interfaces;
 using EventManager.Infrastructure.Identity.DataContext;
 using EventManager.Infrastructure.Identity.Service;
@@ -15,11 +16,12 @@ namespace EventManager.Infrastructure
   {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-      services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("ConnStr"), b => b.MigrationsAssembly("EventManager.API")));
+      services.AddDbContext<IdentifyDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("ConnStr"), b => b.MigrationsAssembly("EventManager.Infrastructure")));
+      services.AddDbContext<EventOrganizerDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("ConnStr"), b => b.MigrationsAssembly("EventManager.Infrastructure")));
 
       // For Identity  
       services.AddIdentity<ApplicationUser, IdentityRole>()
-          .AddEntityFrameworkStores<ApplicationDbContext>()
+          .AddEntityFrameworkStores<IdentifyDbContext>()
           .AddDefaultTokenProviders();
 
       // Adding Authentication  
@@ -47,6 +49,8 @@ namespace EventManager.Infrastructure
 
       // Service for support to authentication operation in the domain context
       services.AddTransient<IIdentityService, IdentityService>();
+      services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+      services.AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>));
       return services;
     }
   }

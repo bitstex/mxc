@@ -72,7 +72,7 @@ Scenario Outline: Jhond user put a modificated event to the endpoint
    And "<oldlocation>" is the location of the event
    And "<oldcountry>" is the country of the event
    And "<oldcapacity>" is the capacity of the event
-   And "<newevent>" is doesn't exist in the database
+   And "<newevent>" event doesn't exist in the database
   When I put the modificated event to the endpoint
    And I type "<newlocation>" in the location field
    And I type "<newcountry>" in the country field
