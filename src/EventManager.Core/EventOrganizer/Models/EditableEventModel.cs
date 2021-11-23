@@ -8,7 +8,7 @@ namespace EventManager.Core.EventOrganizer.Models
 
     public string Location { get; set; }
 
-    public uint Capacity { get; set; }
+    public ushort? Capacity { get; set; }
 
     public string Country { get; set; }
   }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using EventManager.Core.EventOrganizer.Contracts.Interfaces;
 using EventManager.Core.EventOrganizer.Entities;
@@ -68,11 +67,6 @@ namespace EventManager.API.Controllers.EventOrganizer
     public Task<List<EventEntity>> Get([FromQuery] EventFilter filter)
     {
       filter = filter ?? new EventFilter();
-
-      // Here you can decide if you want the collections as well
-
-      filter.IsPagingEnabled = true;
-
       return _eventRepository.ListAsync(new EventSpecification(filter));
     }
 

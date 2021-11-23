@@ -16,12 +16,12 @@ namespace EventManager.Infrastructure
   {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-      services.AddDbContext<IdentitfyDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("ConnStr"), b => b.MigrationsAssembly("EventManager.Infrastructure")));
+      services.AddDbContext<IdentifyDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("ConnStr"), b => b.MigrationsAssembly("EventManager.Infrastructure")));
       services.AddDbContext<EventOrganizerDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("ConnStr"), b => b.MigrationsAssembly("EventManager.Infrastructure")));
 
       // For Identity  
       services.AddIdentity<ApplicationUser, IdentityRole>()
-          .AddEntityFrameworkStores<IdentitfyDbContext>()
+          .AddEntityFrameworkStores<IdentifyDbContext>()
           .AddDefaultTokenProviders();
 
       // Adding Authentication  

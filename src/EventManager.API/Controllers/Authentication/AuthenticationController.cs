@@ -66,7 +66,7 @@ namespace EventManager.API.Controllers.Authentication
     public async Task<IActionResult> Register([FromBody] AuthenticationModel model)
     {
       await _authenticationContext.Registrator(model);
-      return Ok(200);
+      return Ok();
     }
   }
 }

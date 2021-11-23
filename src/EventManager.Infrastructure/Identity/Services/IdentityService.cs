@@ -52,6 +52,7 @@ namespace EventManager.Infrastructure.Identity.Service
 
         var authClaims = new List<Claim>
                 {
+                    new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
                     new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };

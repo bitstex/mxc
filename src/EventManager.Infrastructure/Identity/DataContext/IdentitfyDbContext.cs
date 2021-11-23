@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EventManager.Infrastructure.Identity.DataContext
 {
-  public class IdentitfyDbContext : IdentityDbContext<ApplicationUser>
+  public class IdentifyDbContext : IdentityDbContext<ApplicationUser>
   {
-    public IdentitfyDbContext(DbContextOptions<IdentitfyDbContext> options) : base(options)
+    public IdentifyDbContext(DbContextOptions<IdentifyDbContext> options) : base(options)
     {
     }
   }

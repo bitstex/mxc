@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EventManager.Infrastructure.EventOrganizer.DataContext.Migrations
 {
     [DbContext(typeof(EventOrganizerDbContext))]
-    [Migration("20211123063428_InitialCreate")]
+    [Migration("20211123115044_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,8 +27,8 @@ namespace EventManager.Infrastructure.EventOrganizer.DataContext.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<long?>("Capacity")
-                        .HasColumnType("bigint");
+                    b.Property<int?>("Capacity")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Country")
                         .HasColumnType("text");
@@ -39,6 +39,9 @@ namespace EventManager.Infrastructure.EventOrganizer.DataContext.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime?>("LastModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -47,6 +50,10 @@ namespace EventManager.Infrastructure.EventOrganizer.DataContext.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<string>("Owner")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.HasKey("Id");
 
