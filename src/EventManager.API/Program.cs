@@ -26,6 +26,7 @@ namespace EventManager.API
             })
             .ConfigureLogging(logging =>
             {
+              logging.AddConsole();
               logging.ClearProviders();
               logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
             }).UseNLog();
