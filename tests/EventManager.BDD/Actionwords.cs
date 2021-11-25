@@ -1,15 +1,59 @@
 
+using System.IO;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using EventManager.API;
+using EventManager.Core.Identity.Models;
+using Microsoft.AspNetCore.Http;
+using webapi.tests.Infrastructure;
+
 namespace Example
 {
 
   public class Actionwords
   {
+    public static readonly AuthenticationModel aliceCredentials = new()
+    {
+      Username = "alice",
+      Password = "aPa$$word1234"
+    };
+
+    public static readonly AuthenticationModel jhondCredentials = new()
+    {
+      Username = "jhond",
+      Password = "jPa$$word1234"
+    };
+
     public const string AUTH_LOGIN_ENDPOINT = "api/v1/auth/login";
 
+    public static string ALICE_ACCESS_TOKEN = null;
+    public static string JHOND_ACCESS_TOKEN = null;
+    private readonly CustomWebApiFactory<Startup> _factory;
+
+    public Actionwords(CustomWebApiFactory<Startup> factory)
+    {
+      _factory = factory;
+    }
+
+    private TokenModel login(AuthenticationModel user)
+    {
+      var client = _factory.CreateClient();
+      var response = client.PostAsync(AUTH_LOGIN_ENDPOINT, new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json"));
+      response.Wait();
+      using StreamReader stream = new StreamReader(response.Result.Content.ReadAsStream());
+      string content = stream.ReadToEnd();
+      TokenModel tokenModel = JsonSerializer.Deserialize<TokenModel>(content,new JsonSerializerOptions 
+      {
+          PropertyNameCaseInsensitive = true
+      });
+      return tokenModel;
+    }
 
     public void CallerPresentsAValidAccessToken()
     {
-
+      ALICE_ACCESS_TOKEN = login(aliceCredentials).Token;
+      JHOND_ACCESS_TOKEN = login(jhondCredentials).Token;
     }
 
     public void TheEndpointOfTheEventsControllerP1IsExist(string p1)

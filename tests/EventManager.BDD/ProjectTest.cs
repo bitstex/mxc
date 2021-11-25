@@ -1,10 +1,15 @@
 using System.Net.Http;
+using System.Text;
 using EventManager.API;
+using EventManager.Core.Identity.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Moq;
 using NUnit.Framework;
 using webapi.tests.Infrastructure;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Example
 {
@@ -15,19 +20,28 @@ namespace Example
     #region Variables  
     Actionwords Actionwords;
 
-    private readonly CustomWebApiFactory<EventManager.API.Startup> _factory;
+    private readonly CustomWebApiFactory<EventManager.API.Startup> _factory = new();
     #endregion
-    public ProjectTest()
-    {
-      Actionwords = new Actionwords();
-      _factory = new CustomWebApiFactory<EventManager.API.Startup>();
-    }
 
-
-    [SetUp]
+    [OneTimeSetUp]
     protected void SetUp()
     {
-      Actionwords = new Actionwords();
+      Actionwords = new Actionwords(_factory);
+      SetupAsync().Wait();
+      Actionwords.CallerPresentsAValidAccessToken();
+    }
+
+    public async Task SetupAsync()
+    {
+      var client = _factory
+                .CreateClient();
+      var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/register")
+      {
+        Content = new StringContent(JsonSerializer.Serialize(Actionwords.aliceCredentials), Encoding.UTF8, "application/json")
+      };
+      await client.PostAsync("/api/v1/auth/register", request.Content);
+      request.Content = new StringContent(JsonSerializer.Serialize(Actionwords.jhondCredentials), Encoding.UTF8, "application/json");
+      await client.PostAsync("/api/v1/auth/register", request.Content);
     }
 
     [Test]
