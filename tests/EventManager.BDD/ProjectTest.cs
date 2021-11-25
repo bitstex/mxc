@@ -1,14 +1,28 @@
+using System.Net.Http;
+using EventManager.API;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
+using Moq;
+using NUnit.Framework;
+using webapi.tests.Infrastructure;
+
 namespace Example
 {
-
-  using System;
-  using NUnit.Framework;
 
   [TestFixture]
   public class ProjectTest
   {
+    #region Variables  
+    Actionwords Actionwords;
 
-    public Actionwords Actionwords;
+    private readonly CustomWebApiFactory<EventManager.API.Startup> _factory;
+    #endregion
+    public ProjectTest()
+    {
+      Actionwords = new Actionwords();
+      _factory = new CustomWebApiFactory<EventManager.API.Startup>();
+    }
+
 
     [SetUp]
     protected void SetUp()

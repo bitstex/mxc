@@ -1,9 +1,11 @@
+
 namespace Example
 {
 
   public class Actionwords
   {
-    public static int HTTP_STATUS_CALL_CODE = -1;
+    public const string AUTH_LOGIN_ENDPOINT = "api/v1/auth/login";
+
 
     public void CallerPresentsAValidAccessToken()
     {
