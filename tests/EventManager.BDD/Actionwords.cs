@@ -1,11 +1,17 @@
 
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using EventManager.API;
+using EventManager.Core.EventOrganizer.Entities;
+using EventManager.Core.EventOrganizer.Models;
+using EventManager.Core.EventOrganizer.Specifications.Filters;
 using EventManager.Core.Identity.Models;
-using Microsoft.AspNetCore.Http;
+using NUnit.Framework;
 using webapi.tests.Infrastructure;
 
 namespace Example
@@ -25,75 +31,133 @@ namespace Example
       Password = "jPa$$word1234"
     };
 
-    public const string AUTH_LOGIN_ENDPOINT = "api/v1/auth/login";
+    private static HttpRequestMessage HttpRequest; 
+    private static HttpResponseMessage HttpResponseMessage; 
 
-    public static string ALICE_ACCESS_TOKEN = null;
-    public static string JHOND_ACCESS_TOKEN = null;
+
+    public const string AUTH_LOGIN_ENDPOINT = "http://localhost/api/v1/auth/login";
+    public const string EVENT_ORGANIZER_ENDPOINT = "http://localhost/api/v1/organizer/events";
+
+    private static string ALICE_ACCESS_TOKEN = null;
+    private static string JHOND_ACCESS_TOKEN = null;
     private readonly CustomWebApiFactory<Startup> _factory;
-
+    private static T ReadContent<T>(HttpContent content){
+      using StreamReader streamReader = new StreamReader(new ReusableHttpContent(content).ReadAsStream());
+      string contentStr = streamReader.ReadToEnd();
+      return JsonSerializer.Deserialize<T>(contentStr, new JsonSerializerOptions
+      {
+        PropertyNameCaseInsensitive = true
+      });
+    }
     public Actionwords(CustomWebApiFactory<Startup> factory)
     {
       _factory = factory;
     }
 
-    private TokenModel login(AuthenticationModel user)
-    {
-      var client = _factory.CreateClient();
-      var response = client.PostAsync(AUTH_LOGIN_ENDPOINT, new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json"));
+    private T Post<T,K>(string url, K model, out System.Net.HttpStatusCode code){
+       var client = _factory.CreateClient();
+      var response = client.PostAsync(url, new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
       response.Wait();
+      code = response.Result.StatusCode;
       using StreamReader stream = new StreamReader(response.Result.Content.ReadAsStream());
       string content = stream.ReadToEnd();
-      TokenModel tokenModel = JsonSerializer.Deserialize<TokenModel>(content,new JsonSerializerOptions 
+      return JsonSerializer.Deserialize<T>(content, new JsonSerializerOptions
       {
-          PropertyNameCaseInsensitive = true
+        PropertyNameCaseInsensitive = true
       });
-      return tokenModel;
+    }
+
+     private T Get<T,K>(string url, K model, out System.Net.HttpStatusCode code){
+       var client = _factory.CreateClient();
+       var request = new HttpRequestMessage
+      {
+          Method = HttpMethod.Get,
+          RequestUri = new Uri(url),
+          Content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json")
+      };
+
+      var response = client.SendAsync(request);
+      response.Wait();
+      code = response.Result.StatusCode;
+      using StreamReader stream = new StreamReader(new ReusableHttpContent(response.Result.Content).ReadAsStream());
+      string content = stream.ReadToEnd();
+      return JsonSerializer.Deserialize<T>(content, new JsonSerializerOptions
+      {
+        PropertyNameCaseInsensitive = true
+      });
     }
 
     public void CallerPresentsAValidAccessToken()
     {
-      ALICE_ACCESS_TOKEN = login(aliceCredentials).Token;
-      JHOND_ACCESS_TOKEN = login(jhondCredentials).Token;
+      System.Net.HttpStatusCode code;
+      ALICE_ACCESS_TOKEN = Post<TokenModel, AuthenticationModel>(AUTH_LOGIN_ENDPOINT,aliceCredentials,out code).Token;
+      JHOND_ACCESS_TOKEN = Post<TokenModel, AuthenticationModel>(AUTH_LOGIN_ENDPOINT,jhondCredentials,out code).Token;
     }
 
     public void TheEndpointOfTheEventsControllerP1IsExist(string p1)
     {
-
+      using var client = _factory.CreateClient();
+      var result = client.SendAsync(new HttpRequestMessage(HttpMethod.Post, p1));
+      result.Wait();
+      Assert.AreNotEqual(result.Result.StatusCode, System.Net.HttpStatusCode.NotFound);
     }
 
     public void P1EventDoesntExistInTheDatabase(string p1)
     {
-
+      System.Net.HttpStatusCode code;
+      var events = Get<List<EventEntity>, EventFilter>(EVENT_ORGANIZER_ENDPOINT, new EventFilter(),out code );
+      Assert.False(events.Exists(e => string.Equals(p1, e.Name)));
     }
 
     public void IPostANewEventToTheEndpoint()
     {
-
+     HttpRequest = new()
+      {
+          Method = HttpMethod.Post,
+          RequestUri = new Uri(EVENT_ORGANIZER_ENDPOINT),
+          Content = new StringContent(JsonSerializer.Serialize(new EditableEventModel()), Encoding.UTF8, "application/json")
+      };
+      HttpRequest.Headers.Add("Authorization", "Bearer " + JHOND_ACCESS_TOKEN);
     }
 
     public void ITypeP1InTheLocationField(string p1)
     {
+      var entityModel = ReadContent<EditableEventModel>(HttpRequest.Content);
+      entityModel.Location = p1;
+      HttpRequest.Content = new StringContent(JsonSerializer.Serialize(entityModel), Encoding.UTF8, "application/json");
 
     }
 
     public void ITypeP1InTheCountryField(string p1)
     {
-
+      var entityModel = ReadContent<EditableEventModel>(HttpRequest.Content);
+      entityModel.Country = p1;
+      HttpRequest.Content = new StringContent(JsonSerializer.Serialize(entityModel), Encoding.UTF8, "application/json");
+      
     }
 
     public void ITypeP1InTheNameField(string p1)
     {
-
+      var entityModel = ReadContent<EditableEventModel>(HttpRequest.Content);
+      entityModel.Name = p1;
+      HttpRequest.Content = new StringContent(JsonSerializer.Serialize(entityModel), Encoding.UTF8, "application/json"); 
     }
 
     public void IShouldntTypeIdOrCreationDateOfTheEvent()
     {
+      using StreamReader stream = new StreamReader(new ReusableHttpContent(HttpRequest.Content).ReadAsStream());
+      string content = stream.ReadToEnd().ToLower();
+      Assert.False(content.Contains("id", StringComparison.OrdinalIgnoreCase));
+      Assert.False(content.Contains("createddate", StringComparison.OrdinalIgnoreCase));
 
     }
 
     public void IShouldHaveSeenHTTPStatusIsP1(int p1)
     {
-
+      var response = _factory.CreateClient().SendAsync(HttpRequest);
+      response.Wait();
+      HttpResponseMessage = response.Result;
+      Assert.AreEqual((int)HttpResponseMessage.StatusCode, p1);
     }
 
     public void IShouldHaveSeenHTTPStatusIsP1(string p1)
@@ -103,9 +167,23 @@ namespace Example
       IShouldHaveSeenHTTPStatusIsP1(httpCode);
     }
 
+    
+    public static T DeserializeAnonymousType<T>(string json, T anonymousTypeObject, JsonSerializerOptions options = default)
+        => JsonSerializer.Deserialize<T>(json, options);
+
     public void TheCertainEventIsCreatedInTheDatabaseWithAnUniqueIdOfTheEventAndCreationTimeOfTheEvent()
     {
-
+      var entity = new EventEntity();
+      var definition = new { entity.Id, entity.CreatedDate};
+      
+      using StreamReader stream = new StreamReader(new ReusableHttpContent(HttpResponseMessage.Content).ReadAsStream());
+      string content = stream.ReadToEnd();
+      var deser = DeserializeAnonymousType(content, definition, new JsonSerializerOptions
+      {
+        PropertyNameCaseInsensitive = true
+      });
+      var events = Get<List<EventEntity>, EventFilter>(EVENT_ORGANIZER_ENDPOINT, new EventFilter() { Id = deser.Id }, out var statuscode);
+      Assert.True(events.Any(e => e.CreatedDate == deser.CreatedDate));
     }
 
     public void ITypeP1InTheCapacityField(int? p1)

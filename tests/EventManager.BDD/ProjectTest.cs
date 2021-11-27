@@ -27,6 +27,9 @@ namespace Example
     protected void SetUp()
     {
       Actionwords = new Actionwords(_factory);
+      Actionwords.TheEndpointOfTheEventsControllerP1IsExist(Actionwords.AUTH_LOGIN_ENDPOINT);
+      Actionwords.TheEndpointOfTheEventsControllerP1IsExist(Actionwords.EVENT_ORGANIZER_ENDPOINT);
+
       SetupAsync().Wait();
       Actionwords.CallerPresentsAValidAccessToken();
     }
