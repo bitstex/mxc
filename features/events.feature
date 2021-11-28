@@ -51,10 +51,10 @@ Scenario Outline: User want to create a new event but some parameters are worng
   Examples:
       |  username |     name     |  location     |       country   | capacity |  code    |                 message                 |
       |           |oldtimer autok| Pusztamonostor|   Magyarorszag  |    100   |   403    |      Please log in and try again        |   
-      | jhond     |              | Pusztamonostor|   Magyarorszag  |          |   500    |      Name of the event is must          |
-      | alice     |oldtimer autok|               |                 |          |   500    |      Location of the event is must      |
-      | alice     |koncert       | Budapest      |   Magyarorszag  |    -1    |   500    |      The capacity of the event must be a positive number|
-      | jhond     |              |               |                 |    100   |   500    |      [Name of the event is must, Location of the event is must]|   
+      | jhond     |              | Pusztamonostor|   Magyarorszag  |          |   400    |      Name of the event is must          |
+      | alice     |oldtimer autok|               |                 |          |   400    |      Location of the event is must      |
+      | alice     |koncert       | Budapest      |   Magyarorszag  |    -1    |   400    |      The capacity of the event must be a positive number|
+      | jhond     |              |               |                 |    100   |   400    |      [Name of the event is must, Location of the event is must]|   
 
 Scenario: Jhond user post an event with more than 100 characters long location name to the endpoint
   Given "koncert4" event doesn't exist in the database
@@ -63,7 +63,7 @@ Scenario: Jhond user post an event with more than 100 characters long location n
    And I type "Magyarorszag" in the country field
    And I type "koncert4" in the name field
    But I shouldn't type id or creation date of the event
-  Then I should have seen HTTP status is "500"
+  Then I should have seen HTTP status is "400"
    And I should have seen the "Length of the location is more than 100 characters long" error message 
 
 
@@ -103,21 +103,21 @@ Scenario Outline: User want to modify the event but some parameters are worng
   Examples:
       |  username |     name     |  location     |       country   | capacity |  code    |                 message                 |
       |           |oldtimer autok| Pusztamonostor|   Magyarorszag  |    100   |   403    |      Please log in and try again        |   
-      | jhond     |              | Pusztamonostor|   Magyarorszag  |          |   500    |      Name of the event is must          |
-      | alice     |oldtimer autok|               |                 |          |   500    |      Location of the event is must      |
-      | alice     |koncert       | Budapest      |   Magyarorszag  |    -1    |   500    |      The capacity of the event must be a positive number|
-      | jhond     |              |               |                 |    100   |   500    |      [Name of the event is must, Location of the event is must]| 
+      | jhond     |              | Pusztamonostor|   Magyarorszag  |          |   400    |      Name of the event is must          |
+      | alice     |oldtimer autok|               |                 |          |   400    |      Location of the event is must      |
+      | alice     |koncert       | Budapest      |   Magyarorszag  |    -1    |   400    |      The capacity of the event must be a positive number|
+      | jhond     |              |               |                 |    100   |   400    |      [Name of the event is must, Location of the event is must]| 
       
 Scenario: Jhond user put the event with more than 100 characters long location name to the endpoint
   Given "koncert4" event does exist in the database
   When I put the modificated event to the endpoint
    And I type 101 characters long text in the location field
    But I shouldn't type id or creation date of the event
-  Then I should have seen HTTP status is "500"
+  Then I should have seen HTTP status is "400"
    And I should have seen the "Length of the location is more than 100 characters long" error message 
   
 Scenario: Jhond user want to query details about the certain event by event id
-  Given id of the "kocnert103" event
+  Given id of the "koncert103" event
    And "koncert103" event does exist in the database
    And "Budapest" is the location of the event
    And "Magyarorszag" is the country of the event

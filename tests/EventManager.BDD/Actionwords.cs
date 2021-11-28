@@ -31,15 +31,19 @@ namespace Example
       Password = "jPa$$word1234"
     };
 
-    private static HttpRequestMessage HttpRequest; 
-    private static HttpResponseMessage HttpResponseMessage; 
+    public static HttpRequestMessage HttpRequest; 
+    public static HttpResponseMessage HttpResponseMessage; 
 
-
+    private static bool EVENT_IS_EXIST = false;
     public const string AUTH_LOGIN_ENDPOINT = "http://localhost/api/v1/auth/login";
     public const string EVENT_ORGANIZER_ENDPOINT = "http://localhost/api/v1/organizer/events";
 
     private static string ALICE_ACCESS_TOKEN = null;
     private static string JHOND_ACCESS_TOKEN = null;
+
+    private static  Guid CERTAIN_EVENT_ID; 
+    private static  DateTime CERTAIN_EVENT_DATE; 
+
     private readonly CustomWebApiFactory<Startup> _factory;
     private static T ReadContent<T>(HttpContent content){
       using StreamReader streamReader = new StreamReader(new ReusableHttpContent(content).ReadAsStream());
@@ -157,7 +161,7 @@ namespace Example
       var response = _factory.CreateClient().SendAsync(HttpRequest);
       response.Wait();
       HttpResponseMessage = response.Result;
-      Assert.AreEqual((int)HttpResponseMessage.StatusCode, p1);
+      Assert.AreEqual(p1, (int)HttpResponseMessage.StatusCode);
     }
 
     public void IShouldHaveSeenHTTPStatusIsP1(string p1)
@@ -186,14 +190,28 @@ namespace Example
       Assert.True(events.Any(e => e.CreatedDate == deser.CreatedDate));
     }
 
-    public void ITypeP1InTheCapacityField(int? p1)
+    public void ITypeP1InTheCapacityField(ushort? p1)
     {
-
+      var entityModel = ReadContent<EditableEventModel>(HttpRequest.Content);
+      entityModel.Capacity = p1;
+      HttpRequest.Content = new StringContent(JsonSerializer.Serialize(entityModel), Encoding.UTF8, "application/json"); 
     }
 
     public void P1PostANewEventToTheEndpoint(string p1)
     {
-
+      HttpRequest = new()
+      {
+          Method = HttpMethod.Post,
+          RequestUri = new Uri(EVENT_ORGANIZER_ENDPOINT),
+          Content = new StringContent(JsonSerializer.Serialize(new EditableEventModel()), Encoding.UTF8, "application/json")
+      };
+      var tokent = "";
+      if(String.Equals(p1,aliceCredentials.Username, StringComparison.OrdinalIgnoreCase)){
+        tokent= ALICE_ACCESS_TOKEN;
+      } else if(String.Equals(p1,jhondCredentials.Username, StringComparison.OrdinalIgnoreCase)){
+        tokent= JHOND_ACCESS_TOKEN;
+      }
+      HttpRequest.Headers.Add("Authorization", "Bearer " + tokent);
     }
 
     public void IShouldHaveSeenTheP1ErrorMessage(string p1)
@@ -208,22 +226,22 @@ namespace Example
 
     public void P1EventDoesExistInTheDatabase(string p1)
     {
-
+      EVENT_IS_EXIST = true;
     }
 
     public void P1IsTheLocationOfTheEvent(string p1)
     {
-
+      ITypeP1InTheLocationField(p1);
     }
 
     public void P1IsTheCountryOfTheEvent(string p1)
     {
-
+      ITypeP1InTheCountryField(p1);
     }
 
-    public void P1IsTheCapacityOfTheEvent(int? p1)
+    public void P1IsTheCapacityOfTheEvent(ushort? p1)
     {
-
+      ITypeP1InTheCapacityField(p1);
     }
 
     public void IPutTheModificatedEventToTheEndpoint()
@@ -233,22 +251,30 @@ namespace Example
 
     public void IShouldHaveSeenTheNameOfTheEventIsP1(string p1)
     {
-
+      var entities = ReadContent<List<EventEntity>>(HttpResponseMessage.Content);
+      var entity = entities[0];
+      Assert.AreEqual(p1, entity.Name);
     }
 
     public void IShouldHaveSeenTheLocationOfTheEventIsP1(string p1)
     {
-
+      var entities = ReadContent<List<EventEntity>>(HttpResponseMessage.Content);
+      var entity = entities[0];
+      Assert.AreEqual(p1,entity.Location);
     }
 
     public void IShouldHaveSeenTheCountryOfTheEventIsP1(string p1)
     {
-
+      var entities = ReadContent<List<EventEntity>>(HttpResponseMessage.Content);
+      var entity = entities[0];
+      Assert.AreEqual(p1,entity.Country);
     }
 
-    public void IShouldHaveSeenTheCapacityOfTheEventIsP1(int? p1)
+    public void IShouldHaveSeenTheCapacityOfTheEventIsP1(ushort? p1)
     {
-
+      var entities = ReadContent<List<EventEntity>>(HttpResponseMessage.Content);
+      var entity = entities[0];
+      Assert.AreEqual(p1,entity.Capacity);
     }
 
     public void P1PutTheModificatedEventToTheEndpoint(string p1)
@@ -258,16 +284,36 @@ namespace Example
 
     public void IdOfTheP1Event(string p1)
     {
-
+      IPostANewEventToTheEndpoint();
+      ITypeP1InTheNameField(p1);
     }
 
     public void IGetTheEventById()
     {
-
+      var eventId = Guid.Empty;
+      if(EVENT_IS_EXIST)
+      {
+        IShouldHaveSeenHTTPStatusIsP1(200);
+        var eventCreateResponse = ReadContent<EventEntity>(HttpResponseMessage.Content);
+        CERTAIN_EVENT_DATE = eventCreateResponse.CreatedDate;
+        CERTAIN_EVENT_ID = eventCreateResponse.Id;
+      }
+      var headers =  HttpRequest.Headers;
+      HttpRequest = new()
+      {
+          Method = HttpMethod.Get,
+          RequestUri = new Uri(EVENT_ORGANIZER_ENDPOINT),
+          Content = new StringContent(JsonSerializer.Serialize(new EventFilter(){Id = eventId}), Encoding.UTF8, "application/json"),
+      };
+      HttpRequest.Headers.Add("Authorization", headers.GetValues("Authorization"));
     }
 
     public void IShouldHaveSeenTheIdAndCreationDateOfTheCertainEvent()
     {
+      var entities = ReadContent<List<EventEntity>>(HttpResponseMessage.Content);
+      var entity = entities[0];
+      Assert.AreEqual(CERTAIN_EVENT_ID,entity.Id);
+      Assert.AreEqual(CERTAIN_EVENT_DATE,entity.CreatedDate);
 
     }
 
@@ -338,27 +384,39 @@ namespace Example
 
     public void ICallTheEndpointOfTheLogInApi()
     {
-
+      HttpRequest = new()
+      {
+          Method = HttpMethod.Post,
+          RequestUri = new Uri(AUTH_LOGIN_ENDPOINT),
+          Content = new StringContent(JsonSerializer.Serialize(new AuthenticationModel()), Encoding.UTF8, "application/json")
+      };
     }
 
     public void IFillP1InTheUsernameParameter(string p1)
     {
-
+      var entityModel = ReadContent<AuthenticationModel>(HttpRequest.Content);
+      entityModel.Username = p1;
+      HttpRequest.Content = new StringContent(JsonSerializer.Serialize(entityModel), Encoding.UTF8, "application/json"); 
     }
 
     public void IFillP1InThePasswordParameter(string p1)
     {
-
+      var entityModel = ReadContent<AuthenticationModel>(HttpRequest.Content);
+      entityModel.Password = p1;
+      HttpRequest.Content = new StringContent(JsonSerializer.Serialize(entityModel), Encoding.UTF8, "application/json"); 
     }
 
     public void IShouldHaveValidAccessToken()
     {
-
+      TokenModel token = ReadContent<TokenModel>(HttpResponseMessage.Content);
+      Assert.IsNotNull(token);
+      Assert.IsNotNull(token.Token);
+      Assert.That(token.Expiration, Is.GreaterThan(DateTime.Now));
     }
 
     public void ICallLogInApi()
     {
-
+      ICallTheEndpointOfTheLogInApi();
     }
 
     public void IHaventAValidAccessToken()

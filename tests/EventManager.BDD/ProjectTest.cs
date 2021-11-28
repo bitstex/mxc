@@ -27,12 +27,24 @@ namespace Example
     protected void SetUp()
     {
       Actionwords = new Actionwords(_factory);
-      Actionwords.TheEndpointOfTheEventsControllerP1IsExist(Actionwords.AUTH_LOGIN_ENDPOINT);
-      Actionwords.TheEndpointOfTheEventsControllerP1IsExist(Actionwords.EVENT_ORGANIZER_ENDPOINT);
 
       SetupAsync().Wait();
       Actionwords.CallerPresentsAValidAccessToken();
+      Actionwords.TheEndpointOfTheEventsControllerP1IsExist(Actionwords.EVENT_ORGANIZER_ENDPOINT);
+      Actionwords.TheEndpointOfTheEventsControllerP1IsExist(Actionwords.EVENT_ORGANIZER_ENDPOINT);
     }
+
+    [SetUp]
+    public void ReinitHttpContext()
+    {
+      Actionwords.HttpResponseMessage = null;
+      Actionwords.HttpRequest = null;
+      Actionwords.IPostANewEventToTheEndpoint();
+
+    }
+
+    [TearDown] public void Dispose()
+    { /* ... */ }
 
     public async Task SetupAsync()
     {
@@ -111,7 +123,7 @@ namespace Example
       // And the certain event is created in the database with an unique id of the event and creation time of the event
       Actionwords.TheCertainEventIsCreatedInTheDatabaseWithAnUniqueIdOfTheEventAndCreationTimeOfTheEvent();
     }
-    public void UserWantToCreateANewEventButSomeParametersAreWorng(string username, string name, string location, string country, int? capacity, int code, string message)
+    public void UserWantToCreateANewEventButSomeParametersAreWorng(string username, string name, string location, string country, ushort? capacity, int code, string message)
     {
       // Given "<name>" event doesn't exist in the database
       Actionwords.P1EventDoesntExistInTheDatabase(name);
@@ -143,25 +155,25 @@ namespace Example
     [Test]
     public void UserWantToCreateANewEventButSomeParametersAreWorng2()
     {
-      UserWantToCreateANewEventButSomeParametersAreWorng("jhond", "", "Pusztamonostor", "Magyarorszag", null, 500, "Name of the event is must");
+      UserWantToCreateANewEventButSomeParametersAreWorng("jhond", "", "Pusztamonostor", "Magyarorszag", null, 400, "Name of the event is must");
     }
 
     [Test]
     public void UserWantToCreateANewEventButSomeParametersAreWorng3()
     {
-      UserWantToCreateANewEventButSomeParametersAreWorng("alice", "oldtimer autok", "", "", null, 500, "Location of the event is must");
+      UserWantToCreateANewEventButSomeParametersAreWorng("alice", "oldtimer autok", "", "", null, 400, "Location of the event is must");
     }
 
     [Test]
     public void UserWantToCreateANewEventButSomeParametersAreWorng4()
     {
-      UserWantToCreateANewEventButSomeParametersAreWorng("alice", "koncert", "Budapest", "Magyarorszag", -1, 500, "The capacity of the event must be a positive number");
+      UserWantToCreateANewEventButSomeParametersAreWorng("alice", "koncert", "Budapest", "Magyarorszag", ushort.MinValue, 400, "The capacity of the event must be a positive number");
     }
 
     [Test]
     public void UserWantToCreateANewEventButSomeParametersAreWorng5()
     {
-      UserWantToCreateANewEventButSomeParametersAreWorng("jhond", "", "", "", 100, 500, "[Name of the event is must, Location of the event is must]");
+      UserWantToCreateANewEventButSomeParametersAreWorng("jhond", "", "", "", 100, 400, "[Name of the event is must, Location of the event is must]");
     }
 
 
@@ -181,12 +193,12 @@ namespace Example
       Actionwords.ITypeP1InTheNameField("koncert4");
       // But I shouldn't type id or creation date of the event
       Actionwords.IShouldntTypeIdOrCreationDateOfTheEvent();
-      // Then I should have seen HTTP status is "500"
-      Actionwords.IShouldHaveSeenHTTPStatusIsP1("500");
+      // Then I should have seen HTTP status is "400"
+      Actionwords.IShouldHaveSeenHTTPStatusIsP1("400");
       // And I should have seen the "Length of the location is more than 100 characters long" error message
       Actionwords.IShouldHaveSeenTheP1ErrorMessage("Length of the location is more than 100 characters long");
     }
-    public void JhondUserPutAModificatedEventToTheEndpoint(string oldevent, string newevent, string oldlocation, string newlocation, string oldcountry, string newcountry, int? oldcapacity, int? newcapacity)
+    public void JhondUserPutAModificatedEventToTheEndpoint(string oldevent, string newevent, string oldlocation, string newlocation, string oldcountry, string newcountry, ushort? oldcapacity, ushort? newcapacity)
     {
       // Given "<oldevent>" event does exist in the database
       Actionwords.P1EventDoesExistInTheDatabase(oldevent);
@@ -241,7 +253,7 @@ namespace Example
     }
 
 
-    public void UserWantToModifyTheEventButSomeParametersAreWorng(string username, string name, string location, string country, int? capacity, int code, string message)
+    public void UserWantToModifyTheEventButSomeParametersAreWorng(string username, string name, string location, string country, ushort? capacity, int code, string message)
     {
       // Given "koncert101" event does exist in the database
       Actionwords.P1EventDoesExistInTheDatabase("koncert101");
@@ -272,25 +284,25 @@ namespace Example
     [Test]
     public void UserWantToModifyTheEventButSomeParametersAreWorng2()
     {
-      UserWantToModifyTheEventButSomeParametersAreWorng("jhond", "", "Pusztamonostor", "Magyarorszag", null, 500, "Name of the event is must");
+      UserWantToModifyTheEventButSomeParametersAreWorng("jhond", "", "Pusztamonostor", "Magyarorszag", null, 400, "Name of the event is must");
     }
 
     [Test]
     public void UserWantToModifyTheEventButSomeParametersAreWorng3()
     {
-      UserWantToModifyTheEventButSomeParametersAreWorng("alice", "oldtimer autok", "", "", null, 500, "Location of the event is must");
+      UserWantToModifyTheEventButSomeParametersAreWorng("alice", "oldtimer autok", "", "", null, 400, "Location of the event is must");
     }
 
     [Test]
     public void UserWantToModifyTheEventButSomeParametersAreWorng4()
     {
-      UserWantToModifyTheEventButSomeParametersAreWorng("alice", "koncert", "Budapest", "Magyarorszag", -1, 500, "The capacity of the event must be a positive number");
+      UserWantToModifyTheEventButSomeParametersAreWorng("alice", "koncert", "Budapest", "Magyarorszag", ushort.MinValue, 400, "The capacity of the event must be a positive number");
     }
 
     [Test]
     public void UserWantToModifyTheEventButSomeParametersAreWorng5()
     {
-      UserWantToModifyTheEventButSomeParametersAreWorng("jhond", "", "", "", 100, 500, "[Name of the event is must, Location of the event is must]");
+      UserWantToModifyTheEventButSomeParametersAreWorng("jhond", "", "", "", 100, 400, "[Name of the event is must, Location of the event is must]");
     }
 
 
@@ -306,8 +318,8 @@ namespace Example
       Actionwords.IType101CharactersLongTextInTheLocationField();
       // But I shouldn't type id or creation date of the event
       Actionwords.IShouldntTypeIdOrCreationDateOfTheEvent();
-      // Then I should have seen HTTP status is "500"
-      Actionwords.IShouldHaveSeenHTTPStatusIsP1("500");
+      // Then I should have seen HTTP status is "400"
+      Actionwords.IShouldHaveSeenHTTPStatusIsP1("400");
       // And I should have seen the "Length of the location is more than 100 characters long" error message
       Actionwords.IShouldHaveSeenTheP1ErrorMessage("Length of the location is more than 100 characters long");
     }
@@ -315,8 +327,8 @@ namespace Example
     [Test]
     public void JhondUserWantToQueryDetailsAboutTheCertainEventByEventId()
     {
-      // Given id of the "kocnert103" event
-      Actionwords.IdOfTheP1Event("kocnert103");
+      // Given id of the "koncert103" event
+      Actionwords.IdOfTheP1Event("koncert103");
       // And "koncert103" event does exist in the database
       Actionwords.P1EventDoesExistInTheDatabase("koncert103");
       // And "Budapest" is the location of the event
@@ -411,8 +423,8 @@ namespace Example
       Actionwords.ICallTheEndpointOfTheLogInApi();
       // And I fill "alice" in the username parameter
       Actionwords.IFillP1InTheUsernameParameter("alice");
-      // And I fill "korte1234" in the password parameter
-      Actionwords.IFillP1InThePasswordParameter("korte1234");
+      // And I fill "aPa$$word1234" in the password parameter
+      Actionwords.IFillP1InThePasswordParameter("aPa$$word1234");
       // Then I should have seen HTTP status is "200"
       Actionwords.IShouldHaveSeenHTTPStatusIsP1("200");
       // And I should have valid access token
@@ -427,7 +439,7 @@ namespace Example
       // And I fill "jhond" in the username parameter
       Actionwords.IFillP1InTheUsernameParameter("jhond");
       // And I fill "alma1234" in the password parameter
-      Actionwords.IFillP1InThePasswordParameter("alma1234");
+      Actionwords.IFillP1InThePasswordParameter("jPa$$word1234");
       // Then I should have seen HTTP status is "200"
       Actionwords.IShouldHaveSeenHTTPStatusIsP1("200");
       // And I should have valid access token
@@ -456,7 +468,7 @@ namespace Example
     [Test]
     public void UnableToLogInWithWrongCredentials2()
     {
-      UnableToLogInWithWrongCredentials("", "korte1234");
+      UnableToLogInWithWrongCredentials("", "aPa$$word1234");
     }
 
     [Test]
@@ -468,7 +480,7 @@ namespace Example
     [Test]
     public void UnableToLogInWithWrongCredentials4()
     {
-      UnableToLogInWithWrongCredentials("alice", "alma1234");
+      UnableToLogInWithWrongCredentials("alice", "jPa$$word1234");
     }
   }
 }
